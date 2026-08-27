@@ -6,6 +6,11 @@ import { signAuthToken } from "@/lib/jwt";
 import { signupSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
+  if (!process.env.JWT_SECRET) {
+    console.error("JWT_SECRET is not configured");
+    return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
+  }
+
   const body = await request.json().catch(() => null);
   if (!body) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
@@ -21,21 +26,21 @@ export async function POST(request: Request) {
 
   const { fullName, email, phone, password } = parsed.data;
 
-  const existing = await db.user.findFirst({
-    where: { OR: [{ email }, { phone }] },
-    select: { email: true, phone: true },
-  });
-  if (existing) {
-    const field = existing.email === email ? "email" : "phone";
-    return NextResponse.json(
-      { error: `An account with this ${field} already exists` },
-      { status: 409 }
-    );
-  }
-
-  const passwordHash = await hashPassword(password);
-
   try {
+    const existing = await db.user.findFirst({
+      where: { OR: [{ email }, { phone }] },
+      select: { email: true, phone: true },
+    });
+    if (existing) {
+      const field = existing.email === email ? "email" : "phone";
+      return NextResponse.json(
+        { error: `An account with this ${field} already exists` },
+        { status: 409 }
+      );
+    }
+
+    const passwordHash = await hashPassword(password);
+
     const user = await db.user.create({
       data: { fullName, email, phone, passwordHash },
       select: { id: true, fullName: true, email: true, phone: true, role: true, createdAt: true },
@@ -48,6 +53,7 @@ export async function POST(request: Request) {
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json({ error: "An account with this email or phone already exists" }, { status: 409 });
     }
-    throw err;
+    console.error("Signup failed:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
