@@ -9,11 +9,23 @@ export async function GET(request: Request) {
   const genre = parseGenre(searchParams.get("genre"));
   const categorySlug = searchParams.get("category");
   const sort = searchParams.get("sort");
+  const idsParam = searchParams.get("ids");
   const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
   const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") ?? "20") || 20));
 
   if (genre === null) {
     return NextResponse.json({ error: "Invalid genre" }, { status: 422 });
+  }
+
+  // Batched lookup by id, used to resolve cart/wishlist lines. Bypasses the
+  // status filter so a product stays resolvable even if it's later marked
+  // inactive/out of stock — mirrors the old mock store's selectProductById.
+  if (idsParam) {
+    const ids = idsParam.split(",").map((id) => id.trim()).filter(Boolean);
+    const items = ids.length
+      ? await db.product.findMany({ where: { id: { in: ids } }, include: productInclude })
+      : [];
+    return NextResponse.json({ items: items.map(serializeProduct) });
   }
 
   const where: Prisma.ProductWhereInput = { status: 1 };
