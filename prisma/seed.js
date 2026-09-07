@@ -14,18 +14,26 @@ const ADMIN_PASSWORD = "Admin@12345";
 // stay globally unique (Category.genre is single-valued) — the frontend
 // never sees this prefix, it keeps using its own unprefixed URL slugs.
 const CATEGORIES = [
-  { slug: "bracelets", name: "Bracelets", segments: ["men", "women"] },
-  { slug: "necklaces", name: "Necklaces", segments: ["men", "women"] },
-  { slug: "earrings", name: "Earrings", segments: ["men", "women"] },
-  { slug: "rings", name: "Rings", segments: ["men", "women"] },
+  // Her
+  { slug: "earrings", name: "Earrings", segments: ["women"] },
+  { slug: "bracelets", name: "Bracelets", segments: ["women"] },
+  { slug: "necklaces", name: "Necklaces", segments: ["women"] },
+  { slug: "sets", name: "Sets", segments: ["women"] },
   { slug: "anklets", name: "Anklets", segments: ["women"] },
-  { slug: "nose-rings", name: "Nose Rings", segments: ["women"] },
-  { slug: "hair-pins", name: "Hair Pins", segments: ["women"] },
+  { slug: "hair-clips", name: "Hair Clips", segments: ["women"] },
+  { slug: "rings", name: "Rings", segments: ["women"] },
+  // Him
+  { slug: "leather-bracelet", name: "Leather Bracelet", segments: ["men"] },
+  { slug: "chain-bracelet", name: "Chain Bracelet", segments: ["men"] },
+  { slug: "half-bangle-bracelet", name: "Half Bangle Bracelet", segments: ["men"] },
+  { slug: "neck-chain", name: "Neck Chain", segments: ["men"] },
+  { slug: "ring", name: "Ring", segments: ["men"] },
+  // Gift
   { slug: "keychains", name: "Keychains", segments: ["gift"] },
   { slug: "paperweights", name: "Paperweights", segments: ["gift"] },
   { slug: "home-decor", name: "Home Decor", segments: ["gift"] },
   { slug: "stationery", name: "Stationery", segments: ["gift"] },
-  { slug: "watches", name: "Watch Accents", segments: ["gift", "men"] },
+  { slug: "watches", name: "Watch Accents", segments: ["gift"] },
 ];
 
 const GENRE_BY_SEGMENT = { men: "MALE", women: "FEMALE", gift: "GIFT" };
