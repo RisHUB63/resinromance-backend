@@ -10,8 +10,9 @@ export async function POST(request: Request) {
   if (!auth) return unauthorized();
   if (auth.role !== "ADMIN") return forbidden();
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.error("BLOB_READ_WRITE_TOKEN is not configured");
+  const blobToken = process.env.BLOB_RESIN_READ_WRITE_TOKEN;
+  if (!blobToken) {
+    console.error("BLOB_RESIN_READ_WRITE_TOKEN is not configured");
     return NextResponse.json({ error: "Server misconfiguration" }, { status: 500 });
   }
 
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
   const blob = await put(`products/${Date.now()}-${file.name}`, file, {
     access: "public",
     contentType: file.type,
+    token: blobToken,
   });
 
   return NextResponse.json({ url: blob.url }, { status: 201 });
